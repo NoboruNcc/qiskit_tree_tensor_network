@@ -31,7 +31,8 @@ class PQCTrainerEstimatorQnn:
         qc: QuantumCircuit,
         initial_point: Sequence[float],
         optimizer: Optimizer,
-        estimator: BaseEstimator | None = None
+        estimator: BaseEstimator | None = None,
+        save_path: str | None = None
     ):
         """
         PQCTrainerEstimatorQnnのコンストラクタ.
@@ -41,11 +42,13 @@ class PQCTrainerEstimatorQnn:
             initial_point (Sequence[float]): 初期パラメータ
             optimizer (Optimizer): 最適化アルゴリズム
             estimator (BaseEstimator | None, optional): Estimatorインスタンス
+            save_path (str | None, optional): 最適化されたパラメータを保存するパス
         """
         self.qc_pl = qc  # placeholder circuit
         self.initial_point = np.array(initial_point)
         self.optimizer = optimizer
         self.estimator = estimator
+        self.save_path = save_path
 
     def fit(self,
         dataset: Dataset,
@@ -100,8 +103,9 @@ class PQCTrainerEstimatorQnn:
                     opt_params = params.copy()
                     opt_loss = total_loss
 
-                    with open('opt_params_iris.pkl', 'wb') as fout:
-                        pickle.dump(opt_params, fout)
+                    if self.save_path:
+                        with open(self.save_path, 'wb') as fout:
+                            pickle.dump(opt_params, fout)
 
                 self.optimizer.update(params, total_grads)
 
@@ -143,7 +147,8 @@ def RunPQCTrain(
     init: Sequence[float] | None = None,
     estimator: Estimator | None = None,
     epochs: int = 1,
-    interval = 100
+    interval: int = 100,
+    save_path: str | None = None
 ):    
     """
     PQCのトレーニングを実行する.
@@ -175,11 +180,10 @@ def RunPQCTrain(
     # alpha の値はデフォルトより大きいほうが収束が早かった
     optimizer = Adam(alpha=0.01)
     trainer = PQCTrainerEstimatorQnn(
-        estimator=estimator, qc=qc, initial_point=init, optimizer=optimizer
+        estimator=estimator, qc=qc, initial_point=init, optimizer=optimizer, save_path=save_path
     )
     result = trainer.fit(
         dataset, batch_size, operator,
         callbacks=[store_intermediate_result], epochs=epochs
     )
-
     return result, history['loss']
