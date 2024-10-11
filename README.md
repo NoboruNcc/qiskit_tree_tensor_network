@@ -1,10 +1,11 @@
 # Qiskit Tree Tensor Network
 
 ## プロジェクト概要
-このリポジトリは，IBMのオープンソース量子コンピューティングフレームワークであるQiskitを使用して，ツリーテンソルネットワーク（TTN）を実装したものです．
+このリポジトリでは，IBMのオープンソース量子コンピューティングフレームワークであるQiskitを使用して，ツリーテンソルネットワーク（TTN）を実装した．
+qiskitとqiskit_machine_learningの学習目的のために実装した．
 
 ## インストール
-poetryを使用しています．
+poetryを使用．
 pythonのバージョンは3.10以上を推奨．
 ```bash
 poetry install
